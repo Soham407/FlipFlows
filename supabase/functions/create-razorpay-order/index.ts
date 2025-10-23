@@ -6,7 +6,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-serve(async (req) => {
+serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -39,10 +39,12 @@ serve(async (req) => {
     }
 
     // Create Razorpay order
+    // Receipt must be max 40 chars - using last 8 chars of user.id + timestamp
+    const shortUserId = user.id.slice(-8);
     const orderData = {
       amount: amount * 100, // Convert to paise
       currency: currency,
-      receipt: `receipt_${user.id}_${Date.now()}`,
+      receipt: `rcpt_${shortUserId}_${Date.now()}`,
     };
 
     const authString = btoa(`${razorpayKeyId}:${razorpayKeySecret}`);
@@ -87,8 +89,9 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error('Error in create-razorpay-order:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

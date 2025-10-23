@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "types": ["./_types/deno-ambient"],
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "skipLibCheck": true,
+    "strict": false
+  },
+  "include": ["./**/*.ts"]
+}
